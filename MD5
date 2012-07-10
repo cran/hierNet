@@ -1,0 +1,15 @@
+0eef700627c62fcbd7fea53660bfbab0 *DESCRIPTION
+443050c9c31e4b6a0e27f572bb0fa41d *INDEX
+613aedc365049e5eac9942de9b8953be *NAMESPACE
+5fd1862511467581e27fbc87ff8aabe0 *R/funcs.R
+31a1d65ce1790e500591505d7e88ace1 *man/hierNet-internal.Rd
+0527557bd6ba035694204c80a14294ce *man/hierNet.Rd
+f06fc93971bffd63df8bf45d9fb31e25 *man/hierNet.cv.Rd
+d215776da8734a1375522e62fc797c3d *man/hierNet.logistic.Rd
+8f03fd1c17f83d1e4e26920c78b4e964 *man/hierNet.logistic.path.Rd
+d2059efbc4fe0bffc242c8811e032359 *man/hierNet.path.Rd
+2fd18801230a5d344a186dbae968589e *man/hierNet.varimp.Rd
+4f72007a48d90b05bd5e8c9c56d00a15 *man/predict.hierNet.Rd
+3974f79426589cddd99fe27fec47b97b *man/predict.hierNet.logistic.Rd
+9858f4bc35e1d107d86b672a17ce2c92 *man/predict.hierNet.path.Rd
+cf3e337f3880957330bd487be6e2e9c8 *src/hierNet.c
