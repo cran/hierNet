@@ -25,7 +25,7 @@ the "hierNet.path" or "hiernet.logistic.path" functions.
 estimated probabilities.}
 }
 \references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-A lasso for interactions. Submitted.}
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet}, \link{hierNet.path} }
 \examples{

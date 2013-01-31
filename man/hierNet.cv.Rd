@@ -33,8 +33,8 @@ hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0,...)
   lambda value}
 \item{call}{The call to hierNet.cv}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012) 
-A lasso for hierarchical interactions. Submitted.}
+\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet},\link{hierNet.path}, \link{hierNet.logistic},\link{hierNet.logistic.path}}
 \examples{

@@ -26,7 +26,7 @@ the "hierNet.logistic" function or "hierNet.logistic.path".
   \item{yhat}{Matrix of predictions (probabilities), one row per observation}
 }
 \references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-A lasso for interactions. Submitted.}
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet.logistic}, \link{hierNet.logistic.path} }
 \examples{

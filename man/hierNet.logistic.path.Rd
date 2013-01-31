@@ -15,7 +15,7 @@ on a alternate algorithm for large scale problems.
 }
 \usage{
 hierNet.logistic.path(x, y,
-           lamlist = NULL, minlam = NULL, maxlam = NULL, flmin=.01, nlam = 20,
+           lamlist = NULL, delta=1e-8, minlam = NULL, maxlam = NULL, flmin=.01, nlam = 20,
            diagonal = TRUE, strong = FALSE, aa = NULL, zz = NULL,
            stand.main = TRUE, stand.int = FALSE,
            rho = 1, niter = NULL, sym.eps = 0.001, 
@@ -28,7 +28,8 @@ hierNet.logistic.path(x, y,
     the columns are the predictors}
   \item{y}{A vector of observations equal to 0 or 1, where length(y)  equals
     nrow(x)}
-\item{lamlist}{Optional vector of values of lambda (the regularization parameter)}
+  \item{lamlist}{Optional vector of values of lambda (the regularization parameter).  L1 penalty param is \code{lambda * (1-delta)}.}
+  \item{delta}{Elastic Net parameter. Squared L2 penalty param is \code{lambda * delta}. Not a tuning parameter: Think of as fixed and small. Default 1e-8.}
 \item{minlam}{Optional minimum value for  lambda} 
 \item{maxlam}{Optional maximum value for  lambda}
 \item{flmin}{Fraction of maxlam; minlam= flmin*maxlam. If computation is slow, try increasing
@@ -42,7 +43,7 @@ flmin to focus on the sparser part of the path}
   \item{aa}{An *optional* argument, a list with results from a previous call}
 \item{zz}{An  *optional* argument, a matrix whose columns are products of features, computed by the function compute.interactions.c}
   \item{rho}{ADMM parameter: tuning parameter (>0) for ADMM. If there are convergence
-    problems, try decreasing rho. Default 1.}
+    problems, try decreasing \code{rho}. Default 1.}
   \item{niter}{ADMM parameter: number of iterations}
 \item{sym.eps}{ADMM parameter Thresholding for symmetrizing with strong=TRUE}
 \item{step}{Stepsize for generalized gradient descent}
@@ -64,8 +65,8 @@ flmin to focus on the sparser part of the path}
 \item{mzz}{column means of feature product matrix}
 \item{szz}{column standard deviations of feature product matrix}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012) 
-A lasso for hierarchical interactions. Submitted.}
+\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet},\link{predict.hierNet}, \link{hierNet.cv}}
 \examples{

@@ -1,7 +1,7 @@
 \name{hierNet.logistic}
 \alias{hierNet.logistic}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{A Logistic- Lasso for interactions}
+\title{A logistic regression Lasso for interactions}
 \description{
 One of the main functions in the hierNet package.
 Builds a logistic regression model with hierarchically constrained pairwise interactions.
@@ -13,7 +13,7 @@ on a alternate algorithm for large scale problems.
 
 }
 \usage{
-hierNet.logistic(x, y, lam, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
+hierNet.logistic(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
                  center=TRUE, stand.main=TRUE, stand.int=FALSE,
                  rho=1, niter=100, sym.eps=1e-3,# ADMM params
                  step=1, maxiter=2000, backtrack=0.2, tol=1e-5, trace=1)
@@ -24,7 +24,8 @@ hierNet.logistic(x, y, lam, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
     the columns are the predictors}
   \item{y}{A vector of observations, with values 0 or 1, where length(y)  equals
     nrow(x)}
-  \item{lam}{Regularization parameter (>0)}
+  \item{lam}{Regularization parameter (>0).  L1 penalty param is \code{lam * (1-delta)}.}
+  \item{delta}{Elastic Net parameter. Squared L2 penalty param is \code{lam * delta}. Not a tuning parameter: Think of as fixed and small. Default 1e-8.}
   \item{diagonal}{Flag specifying whether to include "pure" quadratic
     terms, th_{jj}X_j^2, in the model.  Default TRUE.}  
   \item{strong}{Flag specifying strong hierarchy (TRUE) or weak hierarchy (FALSE). Default FALSE}
@@ -34,7 +35,7 @@ hierNet.logistic(x, y, lam, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
   \item{stand.main}{Should main effects be standardized? Default TRUE}
   \item{stand.int}{Should interactions be standardized? Default FALSE}
   \item{rho}{ADMM parameter: tuning parameter (>0) for ADMM. If there are convergence
-    problems, try decreasing rho. Default 1.}
+    problems, try decreasing \code{rho}. Default 1.}
   \item{niter}{ADMM parameter: number of iterations}
   \item{sym.eps}{ADMM parameter Thresholding for symmetrizing with strong=TRUE}
   \item{step}{Stepsize for generalized gradient descent}
@@ -57,8 +58,8 @@ hierNet.logistic(x, y, lam, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
   \item{mzz}{ column means of feature product matrix}
   \item{call}{The call to hierNet}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012) 
-  A lasso for hierarchical interactions. Submitted.}
+\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{predict.hierNet.logistic},link{hierNet.logistic.path}}
 \examples{

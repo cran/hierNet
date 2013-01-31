@@ -14,7 +14,7 @@ on an alternate algorithm for large scale problems.
 }
 \usage{
 hierNet.path(x, y,
-             lamlist = NULL, minlam = NULL, maxlam = NULL, nlam=20, flmin=.01,
+             lamlist = NULL, delta=1e-8, minlam = NULL, maxlam = NULL, nlam=20, flmin=.01,
              diagonal = TRUE, strong = FALSE, aa = NULL, zz = NULL,
              stand.main = TRUE, stand.int = FALSE,
              rho = 1, niter = NULL, sym.eps = 0.001, 
@@ -27,9 +27,10 @@ hierNet.path(x, y,
     the columns are the predictors}
   \item{y}{A vector  of observations, where length(y) equals
     nrow(x)}
-\item{lamlist}{Optional vector of values of lambda (the regularization parameter)}
-\item{minlam}{Optional minimum value for  lambda} 
-\item{maxlam}{Optional maximum value for  lambda}
+  \item{lamlist}{Optional vector of values of lambda (the regularization parameter). L1 penalty param is \code{lamdbda * (1-delta)}.}
+  \item{delta}{Elastic Net parameter. Squared L2 penalty param is \code{lambda * delta}. Not a tuning parameter: Think of as fixed and small. Default 1e-8.}
+\item{minlam}{Optional minimum value for lambda} 
+\item{maxlam}{Optional maximum value for lambda}
 \item{nlam}{Number of values of lambda to be tried}
 \item{flmin}{Fraction of maxlam; minlam= flmin*maxlam. If computation is slow, try increasing
   flmin to focus on the sparser part of the path}
@@ -62,8 +63,8 @@ hierNet.path(x, y,
 \item{mzz}{ column means of feature product matrix}
 \item{szz}{ column standard deviations of feature product matrix}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012) 
-A lasso for hierarchical interactions. Submitted.}
+\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
+"A lasso for interactions." Accepted for publication in Annals of Statistics.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet},\link{predict.hierNet}, \link{hierNet.cv}}
 \examples{

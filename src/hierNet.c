@@ -19,38 +19,38 @@ void compute_yhat_zz(double *x, int n, int p, double *zz, int diagonal,
 void compute_phat_zz(double *x, int n, int p, double *zz, int diagonal, double b0, double *th, double *bp, double *bn, 
 		     double *phat);
 void ggdescent(double *x, int n, int p, double *zz, int diagonal, double *y, 
-	       double lam, double rho, double *V, int maxiter, 
+	       double lamL1, double lamL2, double rho, double *V, int maxiter, 
 	       double *curth, double *curbp, double *curbn,
 	       double t, int stepwindow, double backtrack, double tol, int trace,
 	       double *th, double *bp, double *bn);
 void ggdescent_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, 
-			double lam, double rho, double *V, int maxiter, 
+			double lamL1, double lamL2, double rho, double *V, int maxiter, 
 			double *curb0, double *curth, double *curbp, double *curbn,
 			double t, int stepwindow, double backtrack, double tol, int trace,
 			double *b0, double *th, double *bp, double *bn);
-void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 	    double rho, double *V, double *curth, double *curbp, double *curbn,
 	    double t, double backtrack, double *th, double *bp, double *bn, double *ttaken, double *maxabsdel);
-void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 		     double rho, double *V, double *curb0, double *curth, double *curbp, double *curbn,
 		     double t, double backtrack, double *b0, double *th, double *bp, double *bn, 
 		     double *ttaken, double *maxabsdel);
-void prox_zz(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void prox_zz(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 	     double rho, double *V, double *curth, double *curbp, double *curbn,
 	     double t, double *th, double *bp, double *bn);
-void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 		      double rho, double *V, double *curb0, double *curth, double *curbp, double *curbn,
 		      double t, double *b0, double *th, double *bp, double *bn);
-void prox_zz_given_r(double *x, int n, int p, double *zz, int diagonal, double *r, double lam,
+void prox_zz_given_r(double *x, int n, int p, double *zz, int diagonal, double *r, double lamL1, double lamL2,
 		     double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn);
-void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, double lam,
+void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, double lamL1, double lamL2,
 		     double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn);
-void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, double lam,
+void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, double lamL1, double lamL2,
 		     double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn);
-double prox_objective(double *x, int n, int p, double *zz, int diagonal, double *r, double lam,
+double prox_objective(double *x, int n, int p, double *zz, int diagonal, double *r, double lamL1, double lamL2,
 		      double rho, double *V, double *curth, double *curbp, double *curbn,
 		      double t, double *th, double *bp, double *bn);
 void onerow(double *a, int q, double *b, double c, double mu,
@@ -85,33 +85,33 @@ void compute_phat_zz_R(double *x, int *n, int *p, double *zz, int *diagonal,
   compute_phat_zz(x, *n, *p, zz, *diagonal, *b0, th, bp, bn, phat);
 }
 
-void prox_zz_R(double *x, int *n, int *p, double *zz, int *diagonal, double *y, double *lam,
+void prox_zz_R(double *x, int *n, int *p, double *zz, int *diagonal, double *y, double *lamL1, double *lamL2,
 	    double *rho, double *V, double *curth, double *curbp, double *curbn,
 	    double *t, double *th, double *bp, double *bn) {
-  prox_zz(x, *n, *p, zz, *diagonal, y, *lam, *rho, V, curth, curbp, curbn, *t, th, bp, bn);
+  prox_zz(x, *n, *p, zz, *diagonal, y, *lamL1, *lamL2, *rho, V, curth, curbp, curbn, *t, th, bp, bn);
 }
 
-void ggstep_zz_R(double *x, int *n, int *p, double *zz, int *diagonal, double *y, double *lam,
+void ggstep_zz_R(double *x, int *n, int *p, double *zz, int *diagonal, double *y, double *lamL1, double *lamL2,
 		 double *rho, double *V, double *curth, double *curbp, double *curbn,
 		 double *t, double *backtrack, double *th, double *bp, double *bn, double *ttaken, double *maxabsdel) {
-  ggstep(x, *n, *p, zz, *diagonal, y, *lam, *rho, V, curth, curbp, curbn, *t, *backtrack, th, bp, bn, ttaken, maxabsdel);
+  ggstep(x, *n, *p, zz, *diagonal, y, *lamL1, *lamL2, *rho, V, curth, curbp, curbn, *t, *backtrack, th, bp, bn, ttaken, maxabsdel);
 }
 
 void ggdescent_R(double *x, int *n, int *p, double *zz, int *diagonal, double *y,
-		 double *lam, double *rho, double *V, int *maxiter,
+		 double *lamL1, double *lamL2, double *rho, double *V, int *maxiter,
 		 double *curth, double *curbp, double *curbn,
 		 double *t, int *stepwindow, double *backtrack, double *tol, int *trace,
 		 double *th, double *bp, double *bn) {
-  ggdescent(x, *n, *p, zz, *diagonal, y, *lam, *rho, V, *maxiter, curth, curbp, curbn, 
+  ggdescent(x, *n, *p, zz, *diagonal, y, *lamL1, *lamL2, *rho, V, *maxiter, curth, curbp, curbn, 
   	    *t, *stepwindow, *backtrack, *tol, *trace, th, bp, bn);
 }
 
 void ggdescent_logistic_R(double *x, int *n, int *p, double *zz, int * diagonal, double *y, 
-			  double *lam, double *rho, double *V, int *maxiter, 
+			  double *lamL1, double *lamL2, double *rho, double *V, int *maxiter, 
 			  double *curb0, double *curth, double *curbp, double *curbn,
 			  double *t, int *stepwindow, double *backtrack, double *tol, int *trace,
 			  double *b0, double *th, double *bp, double *bn) {
-  ggdescent_logistic(x, *n, *p, zz, *diagonal, y, *lam, *rho, V, *maxiter, curb0, curth, curbp, curbn,
+  ggdescent_logistic(x, *n, *p, zz, *diagonal, y, *lamL1, *lamL2, *rho, V, *maxiter, curb0, curth, curbp, curbn,
 		     *t, *stepwindow, *backtrack, *tol, *trace, b0, th, bp, bn);
 }
 
@@ -177,14 +177,14 @@ void compute_yhat_zz(double *x, int n, int p, double *zz, int diagonal, double *
   /* 
      if diagonal:
      x: n by p
-     zz: n by cp2
-     th: p^2 (on diagonals assumed to be 0)
+     zz: n by cp2 + p
+     th: p^2
      bp, bn: p
 
      else:
      x: n by p
-     zz: n by cp2 + p
-     th: p^2
+     zz: n by cp2
+     th: p^2 (on diagonals assumed to be 0)
      bp, bn: p
    */
   int i, j, k, jj;
@@ -313,7 +313,7 @@ void ComputeFullInteractions(double *x, int *p_n, int *p_p, double *z) {
 
 
 void ggdescent(double *x, int n, int p, double *zz, int diagonal, double *y, 
-	       double lam, double rho, double *V, int maxiter, 
+	       double lamL1, double lamL2, double rho, double *V, int maxiter, 
 	       double *curth, double *curbp, double *curbn,
 	       double t, int stepwindow, double backtrack, double tol, int trace,
 	       double *th, double *bp, double *bn) {
@@ -331,7 +331,6 @@ void ggdescent(double *x, int n, int p, double *zz, int diagonal, double *y,
   double ttt[stepwindow]; /* last 'stepwindow' stepsizes chosen by BLS. */
   double maxabsdel;
   double *temp;
-  double temp2;
   for (l = 0; l < maxiter; l++) {
     if (trace > 0) Rprintf("%d", l+1);
     if (l < stepwindow)
@@ -343,7 +342,7 @@ void ggdescent(double *x, int n, int p, double *zz, int diagonal, double *y,
 	if (ttt[ll] > tt)
 	  tt = ttt[ll];
     }
-    ggstep(x, n, p, zz, diagonal, y, lam, rho, V, curth, curbp, curbn, tt, backtrack, th, bp, bn, &ttaken, &maxabsdel);
+    ggstep(x, n, p, zz, diagonal, y, lamL1, lamL2, rho, V, curth, curbp, curbn, tt, backtrack, th, bp, bn, &ttaken, &maxabsdel);
     if (maxabsdel < tol) {
       // note: don't need to update (curth,curbp,curbn)
       Rprintf("GG converged in %d iterations.\n", l+1);
@@ -381,7 +380,7 @@ void ggdescent(double *x, int n, int p, double *zz, int diagonal, double *y,
 }
 
 void ggdescent_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, 
-			double lam, double rho, double *V, int maxiter, 
+			double lamL1, double lamL2, double rho, double *V, int maxiter, 
 			double *curb0, double *curth, double *curbp, double *curbn,
 			double t, int stepwindow, double backtrack, double tol, int trace,
 			double *b0, double *th, double *bp, double *bn) {
@@ -401,7 +400,6 @@ void ggdescent_logistic(double *x, int n, int p, double *zz, int diagonal, doubl
   double ttt[stepwindow]; /* last 'stepwindow' stepsizes chosen by BLS. */
   double maxabsdel;
   double *temp;
-  double temp2;
   for (l = 0; l < maxiter; l++) {
     if (trace > 0) Rprintf("%d", l+1);
     if (l < stepwindow)
@@ -413,7 +411,7 @@ void ggdescent_logistic(double *x, int n, int p, double *zz, int diagonal, doubl
 	if (ttt[ll] > tt)
 	  tt = ttt[ll];
     }
-    ggstep_logistic2(x, n, p, zz, diagonal, y, lam, rho, V, curb0, curth, curbp, curbn, 
+    ggstep_logistic2(x, n, p, zz, diagonal, y, lamL1, lamL2, rho, V, curb0, curth, curbp, curbn, 
 		     tt, backtrack, b0, th, bp, bn, &ttaken, &maxabsdel);
     if (maxabsdel < tol) {
       // note: don't need to update (curth,curbp,curbn)
@@ -453,7 +451,7 @@ void ggdescent_logistic(double *x, int n, int p, double *zz, int diagonal, doubl
   }
 }
 
-void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 	    double rho, double *V, double *curth, double *curbp, double *curbn,
 	    double t, double backtrack, double *th, double *bp, double *bn, double *ttaken, double *maxabsdel) {
   /*
@@ -463,7 +461,7 @@ void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double
   */
   if (backtrack >= 1 || backtrack <= 0)
     Rprintf("WARNING!  'backtrack' must be in (0,1) for backtracking to work!");
-  int i, j, k, l, jj;
+  int i, j, jj;
   double tt, left, right0, right, dotprod, temp;
   double r[n], curr[n], cm[p], delbp[p], delbn[p], delth[p*p];
   int ismajorizing = 0;
@@ -481,7 +479,7 @@ void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double
   // now start backtracking steps...
   while (tt > SMALL) {
     // try taking a step of size tt:
-    prox_zz(x, n, p, zz, diagonal, y, lam, rho, V, curth, curbp, curbn, tt, th, bp, bn);
+    prox_zz(x, n, p, zz, diagonal, y, lamL1, lamL2, rho, V, curth, curbp, curbn, tt, th, bp, bn);
     // compute this step's residual, r.  Also, compute 'left':
     left = 0;
     compute_yhat_zz(x, n, p, zz, diagonal, th, bp, bn, r);
@@ -534,7 +532,7 @@ void ggstep(double *x, int n, int p, double *zz, int diagonal, double *y, double
   }
 }
 
-void prox_zz(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void prox_zz(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 	     double rho, double *V, double *curth, double *curbp, double *curbn,
 	     double t, double *th, double *bp, double *bn) {
   /* 
@@ -547,7 +545,7 @@ void prox_zz(double *x, int n, int p, double *zz, int diagonal, double *y, doubl
   compute_yhat_zz(x, n, p, zz, diagonal, curth, curbp, curbn, r);
   for (i = 0; i < n; i++)
     r[i] = y[i] - r[i];
-  prox_zz_given_r(x, n, p, zz, diagonal, r, lam, rho, V, curth, curbp, curbn, t, th, bp, bn);
+  prox_zz_given_r(x, n, p, zz, diagonal, r, lamL1, lamL2, rho, V, curth, curbp, curbn, t, th, bp, bn);
 }
 
 double compute_logistic_loss(double *x, int n, int p, double *zz, int diagonal, double *y, double b0, double *th, double *bp, double *bn) {
@@ -565,11 +563,11 @@ double compute_logistic_loss(double *x, int n, int p, double *zz, int diagonal, 
   return loss;
 }
 
-double penalty(double *x, int n, int p, int diagonal, double lam, double rho, double *V,
+double penalty(double *x, int n, int p, int diagonal, double lamL1, double lamL2, double rho, double *V,
 	       double b0, double *th, double *bp, double *bn) {
-  /* includes ADMM terms as well as l1 penalties. */
+  /* includes ADMM terms as well as l1 and l2 penalties. */
   int j, jj;
-  double pen = 0, pen1 = 0, pen2 = 0;
+  double pen = 0, pen1 = 0, pen2 = 0, pen3 = 0;
   for (jj = 0; jj < p*p; jj++) {
     pen += abs(th[jj]);
     pen1 += th[jj] * th[jj];
@@ -582,79 +580,29 @@ double penalty(double *x, int n, int p, int diagonal, double lam, double rho, do
   pen /= 2;
   for (j = 0; j < p; j++)
     pen += bp[j] + bn[j];
-  pen *= lam;
+  pen *= lamL1;
   pen += rho * pen1 / 2;
   pen += pen2;
+  if (lamL2 != 0) {
+    // elastic net term
+    for (j = 0; j < p; j++)
+      pen3 += bp[j] * bp[j] + bn[j] * bn[j];
+    pen += lamL2 * (pen3 + pen1);
+  }
   return pen; 
 }
 
 double compute_logistic_objective(double *x, int n, int p, double *zz, int diagonal, double *y,
-				  double lam, double rho, double *V,
+				  double lamL1, double lamL2, double rho, double *V,
 				  double b0, double *th, double *bp, double *bn) {
   /* 
      negative log-likelihood + penalty terms
   */
-  return compute_logistic_loss(x, n, p, zz, diagonal, y, b0, th, bp, bn) + penalty(x, n, p, diagonal, lam, rho, V, b0, th, bp, bn);
+  return compute_logistic_loss(x, n, p, zz, diagonal, y, b0, th, bp, bn) + penalty(x, n, p, diagonal, lamL1,lamL2, rho, V, b0, th, bp, bn);
 }
 
-double compute_logistic_gg_majorizer_obj(double *x, int n, int p, double *zz, int diagonal, double *y, double lam, double rho, double *V, 
-					 double curb0, double *curth, double *curbp, double *curbn,
-					 double tt, double b0, double *th, double *bp, double *bn) {
-  // This function in the diagonal==TRUE has not been fully implemented.
-  int i, j, k, jj, kk, cp2 = p * (p - 1) / 2;
-  if (diagonal) cp2 += p;
-  double curr[n], sumcurr, cm[p], ci[cp2], right, right0, right1;
-  compute_phat_zz(x, n, p, zz, diagonal, curb0, curth, curbp, curbn, curr);
-  sumcurr = 0;
-  for (i = 0; i < n; i++) {
-    curr[i] = y[i] - curr[i];
-    sumcurr += curr[i];
-  }
-  ComputeCrossProd(x, n, p, curr, 1, cm);
-  ComputeCrossProd(zz, n, cp2, curr, 1, ci);
-  right0 = sumcurr * sumcurr;
-  for (j = 0; j < p; j++)
-    right0 += 2 * cm[j] * cm[j]; // factor of 2 b/c of (X:-X)
-  for (jj = 0; jj < cp2; jj++)
-    right0 += ci[jj] * ci[jj] / 2; // factor of 2 b/c of 2[(x_j*x_k/2)^Tr]^2
-  if (diagonal) {
-    // note: for diagonal elements, it is ci[jj]^2/4.
-    for (j = 0; j < p; j++) {
-      jj = utd(j,j,p);
-      right0 -= ci[jj] * ci[jj] / 4; // is 1/4 the correct factor?
-    }
-  }
-  right1 = compute_logistic_loss(x, n, p, zz, diagonal, y, curb0, curth, curbp, curbn);// see logistic.pdf
-  right = pow(b0 - curb0 - tt * sumcurr, 2);
-  for (j = 0; j < p; j++) {
-    right += pow(bp[j] - curbp[j] - tt * cm[j], 2);
-    right += pow(bn[j] - curbn[j] + tt * cm[j], 2);
-  }
-  if (diagonal) {
-    // This case would use utd and not skip j == k.
-    Rprintf("THIS CASE HAS NOT BEEN IMPLEMENTED!");
-    return 0;
-  }
-  else {
-    for (j = 0; j < p; j++) {
-      for (k = 0; k < p; k++) {
-	if (j == k) continue;
-	jj = j + p * k;
-	if (j < k)
-	  kk = ut(j,k,p);
-	else
-	  kk = ut(k,j,p);
-	right += pow(th[jj] - curth[jj] - tt * ci[kk]/2, 2);
-      }
-    }
-  }
-  right /= 2 * tt;
-  right += right1 - (tt / 2) * right0;
-  right += penalty(x, n, p, diagonal, lam, rho, V, b0, th, bp, bn);
-  return right;
-}
 
-void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 		     double rho, double *V, double *curb0, double *curth, double *curbp, double *curbn,
 		     double t, double backtrack, double *b0, double *th, double *bp, double *bn, 
 		     double *ttaken, double *maxabsdel) {
@@ -665,9 +613,9 @@ void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double 
   */
   if (backtrack >= 1 || backtrack <= 0)
     Rprintf("WARNING!  'backtrack' must be in (0,1) for backtracking to work!");
-  int i, j, k, l, jj, kk;
+  int i, j, jj;
   double tt, left, curloss, loss, right, sqnorm, temp, sumcurr;
-  double r[n], curr[n], delr[n], delyhat[n], delb0, delbp[p], delbn[p], delth[p*p];
+  double curr[n], delr[n], delyhat[n], delb0, delbp[p], delbn[p], delth[p*p];
   int ismajorizing = 0;
   // compute current residual, curr.  Also, form the constant part of 'right':
   compute_phat_zz(x, n, p, zz, diagonal, *curb0, curth, curbp, curbn, curr);
@@ -685,7 +633,7 @@ void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double 
     //Rprintf("Q(*|x^k-1)=%f\n",compute_logistic_gg_majorizer_obj(x, n, p, zz, diagonal, y, lam, rho, V, *curb0, curth, curbp, curbn, tt, *curb0, curth, curbp, curbn));
     *b0 = *curb0 + tt * sumcurr;
     //Rprintf("Q(*|x^k-1)=%f\n",compute_logistic_gg_majorizer_obj(x, n, p, zz, diagonal, y, lam, rho, V, *curb0, curth, curbp, curbn, tt, *b0, curth, curbp, curbn));
-    prox_zz_logistic(x, n, p, zz, diagonal, y, lam, rho, V, curb0, curth, curbp, curbn, tt, b0, th, bp, bn);
+    prox_zz_logistic(x, n, p, zz, diagonal, y, lamL1, lamL2, rho, V, curb0, curth, curbp, curbn, tt, b0, th, bp, bn);
     //Rprintf("Q(*|x^k-1)=%f\n",compute_logistic_gg_majorizer_obj(x, n, p, zz, diagonal, y, lam, rho, V, *curb0, curth, curbp, curbn, tt, *b0, th, bp, bn));
     loss = compute_logistic_loss(x, n, p, zz, diagonal, y, *b0, th, bp, bn);
     // compute ||coefs^k-coefs^{k-1}||^2/(2t) and  yhat^{k} - yhat^{k-1} (see logistic.pdf):
@@ -761,7 +709,7 @@ void ggstep_logistic2(double *x, int n, int p, double *zz, int diagonal, double 
 }
 
 
-void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, double lam,
+void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double *y, double lamL1, double lamL2,
 		      double rho, double *V, double *curb0, double *curth, double *curbp, double *curbn,
 		      double t, double *b0, double *th, double *bp, double *bn) {
   /* 
@@ -777,7 +725,7 @@ void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double 
   compute_phat_zz(x, n, p, zz, diagonal, *curb0, curth, curbp, curbn, r);
   for (i = 0; i < n; i++)
     r[i] = y[i] - r[i];
-  prox_zz_given_r(x, n, p, zz, diagonal, r, lam, rho, V, curth, curbp, curbn, t, th, bp, bn);
+  prox_zz_given_r(x, n, p, zz, diagonal, r, lamL1, lamL2, rho, V, curth, curbp, curbn, t, th, bp, bn);
 
 
   /*
@@ -792,10 +740,10 @@ void prox_zz_logistic(double *x, int n, int p, double *zz, int diagonal, double 
   */
 }
 
-double prox_objective(double *x, int n, int p, double *zz, int diagonal, double *r, double lam,
+double prox_objective(double *x, int n, int p, double *zz, int diagonal, double *r, double lamL1, double lamL2,
 		      double rho, double *V, double *curth, double *curbp, double *curbn,
 		      double t, double *th, double *bp, double *bn) {
-  int i, j, k, jj, ii, kk;
+  int j, k, jj, kk;
   int cp2 = p * (p-1) / 2;
   if (diagonal) cp2 += p;
   double cm[p];
@@ -841,20 +789,20 @@ double prox_objective(double *x, int n, int p, double *zz, int diagonal, double 
   }
   //printf("zz[0]=%f ci[0]=%f cm[0]=%f rss=%f\n",zz[0],ci[0],cm[0],obj);
   obj /= 2 * t;
-  obj += penalty(x, n, p, diagonal, lam, rho, V, 0, th, bp, bn);
+  obj += penalty(x, n, p, diagonal, lamL1, lamL2, rho, V, 0, th, bp, bn);
   return obj;
 }
 
-void prox_zz_given_r(double *x, int n, int p, double *zz, int diagonal, double *r, double lam,
-		     double rho, double *V, double *curth, double *curbp, double *curbn,
+void prox_zz_given_r(double *x, int n, int p, double *zz, int diagonal, double *r, double lamL1, 
+		     double lamL2, double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn) {
   if (diagonal)
-    prox_zz_given_r_withdiag(x, n, p, zz, r, lam, rho, V, curth, curbp, curbn, t, th, bp, bn);
+    prox_zz_given_r_withdiag(x, n, p, zz, r, lamL1, lamL2, rho, V, curth, curbp, curbn, t, th, bp, bn);
   else
-    prox_zz_given_r_nodiag(x, n, p, zz, r, lam, rho, V, curth, curbp, curbn, t, th, bp, bn);
+    prox_zz_given_r_nodiag(x, n, p, zz, r, lamL1, lamL2, rho, V, curth, curbp, curbn, t, th, bp, bn);
 }
 
-void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, double lam,
+void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, double lamL1, double lamL2,
 		     double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn) {
   /* 
@@ -863,23 +811,27 @@ void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, doub
      this solves the prox without computing r.  This makes it applicable for both
      linear regression and logistic regression losses.  It takes r instead of y.
 
-     min_{bp,bn,th} ||bp-(curbp+t*X^Tr)||^2 + ||bn-(curbn-t*X^Tr)||^2 + ||th-(curth+t*zz^Tr)||^2 
-                    + (2t)*lam*sum(bp+bn) + (2t)*V^Tth + (2t)*(rho/2)||th||^2 
-		    + (2t)*(lam/2)||th||_1
+     min_{bp,bn,th} ||bp - (curbp+t*X^Tr)||^2 + ||bn - (curbn-t*X^Tr)||^2
+                    + ||th - (curth+t*zz^Tr)||^2 
+                    + (2t)*lamL1*sum(bp+bn) + (2t)*V^Tth + (2t)*(rho/2)||th||^2 
+		    + (2t)*(lamL1/2)||th||_1 + (2t)*lamL2*(sum(bp^2)+sum(bn^2)+sum(th^2))
      subject to bp>=0, bn>=0, ||th_j||_1 <= bp_j + bn_j
+
+     See admm4.pdf for details.
 
      curth, curbp, curbn are not modified.  Rather th, bp, bn are. 
   */
-  int i, j, k, jj, ii, kk;
+  int j, k, jj, ii, kk;
   int cp2 = p * (p-1) / 2;
   double cm[p], a[p-1], b[2], row[p-1], beta[2], s[p-1];
   double ci[cp2];
-  double c, mu, alpha;
+  double c, mu, alpha, d;
   //double before_proxj;
   ComputeCrossProd(x, n, p, r, 1, cm);
   ComputeCrossProd(zz, n, cp2, r, 1, ci);
-  c = 1 + t * rho;
-  mu = t * lam / 2;
+  d = 1 + 2 * t * lamL2;
+  c = 1 + t * rho / d;
+  mu = t * lamL1 / (2*d);
   for (j = 0; j < p; j++) { // this is a loop over rows of Theta
     ii = 0;
     // calculate a and b for this j:
@@ -893,7 +845,7 @@ void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, doub
 	kk = ut(j,k,p);
       else
 	kk = ut(k,j,p);
-      a[k-ii] = (curth[jj] + t * (ci[kk]/2 - V[jj])) / c;
+      a[k-ii] = (curth[jj] + t * (ci[kk]/2 - V[jj])) / (c*d);
       // take absolute value of a while retaining signs for later.
       if (a[k-ii] < 0) {
 	s[k-ii] = -1;
@@ -903,8 +855,8 @@ void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, doub
       }
     }
 
-    b[0] = curbp[j] + t * (cm[j] - lam);
-    b[1] = curbn[j] - t * (cm[j] + lam);
+    b[0] = (curbp[j] + t * (cm[j] - lamL1)) / d;
+    b[1] = (curbn[j] - t * (cm[j] + lamL1)) / d;
     // do "onerow" for this (a, b) pair
     onerow(a, p-1, b, c, mu, row, beta, &alpha);
     /* This was for debugging:
@@ -928,13 +880,13 @@ void prox_zz_given_r_nodiag(double *x, int n, int p, double *zz, double *r, doub
   }
 }
 
-void prox_zz_given_r_withdiag_R(double *x, int *n, int *p, double *zz, double *r, double *lam,
+void prox_zz_given_r_withdiag_R(double *x, int *n, int *p, double *zz, double *r, double *lamL1, double *lamL2,
 		     double *rho, double *V, double *curth, double *curbp, double *curbn,
 		     double *t, double *th, double *bp, double *bn) {
-  prox_zz_given_r_withdiag(x, *n, *p, zz, r, *lam, *rho, V, curth, curbp, curbn, *t, th, bp, bn);
+  prox_zz_given_r_withdiag(x, *n, *p, zz, r, *lamL1, *lamL2, *rho, V, curth, curbp, curbn, *t, th, bp, bn);
 }
 
-void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, double lam,
+void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, double lamL1, double lamL2,
 		     double rho, double *V, double *curth, double *curbp, double *curbn,
 		     double t, double *th, double *bp, double *bn) {
   /* 
@@ -943,24 +895,29 @@ void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, do
      this solves the prox without computing r.  This makes it applicable for both
      linear regression and logistic regression losses.  It takes r instead of y.
 
-     min_{bp,bn,th} ||bp-(curbp+t*X^Tr)||^2 + ||bn-(curbn-t*X^Tr)||^2 + ||th-(curth+t*zz^Tr)||^2 
-                    + (2t)*lam*sum(bp+bn) + (2t)*V^Tth + (2t)*(rho/2)||th||^2 
-		    + (2t)*(lam/2)||th||_1 + (2t)*(lam/2)||diag(th)||_1
+     min_{bp,bn,th} ||bp - (curbp+t*X^Tr)||^2 + ||bn - (curbn-t*X^Tr)||^2
+                    + ||th - (curth+t*zz^Tr)||^2 
+                    + (2t)*lamL1*sum(bp+bn) + (2t)*V^Tth + (2t)*(rho/2)||th||^2 
+		    + (2t)*(lamL1/2)||th||_1 + (2t)*(lamL1/2)||diag(th)||_1 
+		    + (2t)*lamL2*(sum(bp^2)+sum(bn^2)+sum(th^2))
      subject to bp>=0, bn>=0, ||th_j||_1 <= bp_j + bn_j
+
+     See admm4.pdf for details.
 
      curth, curbp, curbn are not modified.  Rather th, bp, bn are. 
   */
-  int i, j, k, jj, kk;
+  int j, k, jj, kk;
   int cp2 = p * (p+1) / 2;
   double cm[p], a[p], b[2], row[p], beta[2], s[p];
   double ci[cp2];
-  double c, mu, alpha;
-  double before_proxj;
+  double c, mu, alpha, d;
+  //double before_proxj;
   ComputeCrossProd(x, n, p, r, 1, cm);
   ComputeCrossProd(zz, n, cp2, r, 1, ci);
 
-  c = 1 + t * rho;
-  mu = t * lam / 2;
+  d = 1 + 2 * t * lamL2;
+  c = 1 + t * rho / d;
+  mu = t * lamL1 / (2*d);
   for (j = 0; j < p; j++) { // this is a loop over rows of Theta
     // calculate a and b for this j:
     //Rprintf("j=%d\n",j);
@@ -969,7 +926,7 @@ void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, do
       jj = j + p * k;
       if (j == k) {
 	kk = utd(j,j,p);
-	a[k] = (curth[jj] + t * (ci[kk] - V[jj])) / c;
+	a[k] = (curth[jj] + t * (ci[kk] - V[jj])) / (c*d);
 	//printf("curth[jj]=%f  V[jj]=%f",curth[jj],V[jj]);
 	//printf("ci[kk]=%fn",ci[kk]);
       } else {
@@ -977,7 +934,7 @@ void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, do
 	  kk = utd(j,k,p);
 	else if (j > k)
 	  kk = utd(k,j,p);
-	a[k] = (curth[jj] + t * (ci[kk]/2 - V[jj])) / c;
+	a[k] = (curth[jj] + t * (ci[kk]/2 - V[jj])) / (c*d);
 	//printf("curth[jj]=%f  V[jj]=%f",curth[jj],V[jj]);
 	//printf("ci[kk]=%f\n",ci[kk]);
       }
@@ -990,8 +947,8 @@ void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, do
       }
     }
     
-    b[0] = curbp[j] + t * (cm[j] - lam);
-    b[1] = curbn[j] - t * (cm[j] + lam);
+    b[0] = (curbp[j] + t * (cm[j] - lamL1)) / d;
+    b[1] = (curbn[j] - t * (cm[j] + lamL1)) / d;
     // do "onerow" for this (a, b) pair
     onerow_withdiag(a, p, j, b, c, mu, row, beta, &alpha);
     // This is for debugging:
@@ -1015,7 +972,7 @@ void prox_zz_given_r_withdiag(double *x, int n, int p, double *zz, double *r, do
 void onerow(double *a, int q, double *b, double c, double mu,
 	    double *th, double *beta, double *alpha) {
   // assume a_j >= 0
-  int j, I, J;
+  int j, I;
   double b1, b2, lower; // b1 <= b2
   double val, ffold, ff, prev, cur;
   for (j = 0; j < q; j++) {
@@ -1138,7 +1095,7 @@ void onerow_withdiag(double *a, int q, int jj, double *b, double c, double mu,
 	    double *th, double *beta, double *alpha) {
   // assume a_j >= 0
   // jj is the index of the row we're on.
-  int j, I, J;
+  int j, I;
   double b1, b2, lower; // b1 <= b2
   double val, ffold, ff, prev, cur;
   for (j = 0; j < q; j++) {

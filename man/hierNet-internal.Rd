@@ -16,10 +16,10 @@
 \method{print}{hierNet.cv}(x,...)
 \method{print}{hierNet.logistic}(x,...)
 \method{plot}{hierNet.cv}(x,...)
-critf.logistic(x, y, lam, b0, bp, bn, th)
-Objective(aa, x, y, lam, xnum = NULL, zz = NULL, strong = TRUE, 
+critf.logistic(x, y, lam.l1, lam.l2, b0, bp, bn, th)
+Objective(aa, x, y, lam.l1, lam.l2, xnum = NULL, zz = NULL, strong = TRUE, 
     sym.eps = 0.001)
-Objective.logistic(aa, x, y, lam, xnum = NULL, zz = NULL, strong = TRUE, 
+Objective.logistic(aa, x, y, lam.l1, lam.l2, xnum = NULL, zz = NULL, strong = TRUE, 
     sym.eps = 0.001) 
 compute.interactions.c(x, diagonal = TRUE)
 }
