@@ -245,6 +245,11 @@ hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NUL
 }
 
 predict.hierNet <- function(object, newx, newzz=NULL, ...) {
+  n <- nrow(newx)
+  if (is.null(object$sx))
+    newx <- scale(newx, center=object$mx, scale=FALSE)
+  else
+    newx <- scale(newx, center=object$mx, scale=object$sx)    
   if (is.null(newzz))
     newzz <- compute.interactions.c(newx, diagonal=object$diagonal)
   if (is.null(object$szz))
@@ -252,11 +257,6 @@ predict.hierNet <- function(object, newx, newzz=NULL, ...) {
   else
     newzz <- scale(newzz, center=object$mzz, scale=object$szz)
   newzz <- as.numeric(newzz)
-  n <- nrow(newx)
-  if (is.null(object$sx))
-    newx <- scale(newx, center=object$mx, scale=FALSE)
-  else
-    newx <- scale(newx, center=object$mx, scale=object$sx)    
   newx <- as.numeric(newx)
   stopifnot(is.finite(newzz), is.finite(newx))
   if (class(object$bp) == "numeric")

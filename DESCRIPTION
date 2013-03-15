@@ -1,6 +1,6 @@
 Package: hierNet
 Title: A Lasso for Hierarchical Interactions
-Version: 1.01
+Version: 1.2
 Author: Jacob Bien and Rob Tibshirani
 Description: Fits sparse interaction models for continuous and binary
         responses subject to the strong (or weak) hierarchy restriction
@@ -12,6 +12,7 @@ Description: Fits sparse interaction models for continuous and binary
 Maintainer: Jacob Bien <jbien@cornell.edu>
 License: GPL-2
 URL:
-Packaged: 2013-01-31 21:32:25 UTC; jbien
+Packaged: 2013-03-15 17:51:06 UTC; jbien
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-02-01 20:09:49
+Date/Publication: 2013-03-15 19:20:57
