@@ -103,24 +103,35 @@ print.hierNet <- function(x, ...) {
   o2=colSums(th^2)!=0
   b=x$bp-x$bn
   o=b!=0
-  th=th[o,o2]
   b=b[o]
-  tight <- rowSums(abs(th)) >= x$bp[o] + x$bn[o] - 1e-9
-  print(which(o)[tight])
-  tt <- rep("", length(tight))
-  tt[tight] <- "*"  
-  mat=cbind(b,th)
-  mat=round(mat,4)
-  mat <- cbind(mat, tt)
-  cat("\n")
-  cat("Non-zero coefficients:",fill=T)
-  cat("rows are predictors with nonzero main effects;",fill=T)
-  cat("columns are main effect, and interaction of row predictor
- with predictor in each column",fill=T)
-  cat("\n")
-  
-  dimnames(mat)=list(as.character(which(o)),c("Main effect",as.character(which(o2)),"Tight?"))
-  print(mat, quote = FALSE)
+  if (any(o2)) {
+    # model has interactions
+    th=th[o,o2]
+    tight <- rowSums(abs(th)) >= x$bp[o] + x$bn[o] - 1e-9
+    print(which(o)[tight])
+    tt <- rep("", length(tight))
+    tt[tight] <- "*"
+    mat=cbind(b,th)
+    mat=round(mat,4)
+    mat <- cbind(mat, tt)
+    cat("\n")
+    cat("Non-zero coefficients:",fill=T)
+    cat("  (Rows are predictors with nonzero main effects)",fill=T)
+    cat("  (1st column is main effect)", fill=T)
+    cat("  (Next columns are nonzero interactions of row predictor)", fill=T)
+    cat("  (Last column indicates whether hierarchy constraint is tight.)",fill=T)
+    cat("\n")
+    dimnames(mat)=list(as.character(which(o)),c("Main effect",as.character(which(o2)),"Tight?"))
+    print(mat, quote = FALSE)
+  } else {
+    mat <- matrix(round(b,4), length(b), 1)
+    cat("\n")
+    cat("Non-zero coefficients:",fill=T)
+    cat("  (No interactions in this model)",fill=T)
+    cat("\n")
+    dimnames(mat)=list(as.character(which(o)),"Main effect")
+    print(mat, quote = FALSE)    
+  }
   invisible()
 }
 
@@ -260,7 +271,7 @@ predict.hierNet <- function(object, newx, newzz=NULL, ...) {
   newx <- as.numeric(newx)
   stopifnot(is.finite(newzz), is.finite(newx))
   if (class(object$bp) == "numeric")
-    yhatt <- Compute.yhat.c(newx, newzz, object)
+    yhatt <- Compute.yhat.c(newx, newzz, object) + object$my
   else {
     nlam <- ncol(object$bp)
     yhat <- matrix(NA, n, nlam)
@@ -887,22 +898,28 @@ hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
   }
   else nfolds <- length(folds)
   
-  lamlist=fit$lamlist       
+  lamlist=fit$lamlist
+
+  # get whether fit was standardized based on fit$sx and fit$szz...
+  if (is.null(fit$mx)) stop("hierNet object was not centered.  hierNet.cv has not been written for this (unusual) case.")
+  stand.main <- !is.null(fit$sx)
+  stand.int <- !is.null(fit$szz)
   
   n.lamlist <- length(lamlist)        ### Set up the data structures
-  yhat <-matrix(NA,nrow=n,ncol=length(lamlist))
   size <- double(n.lamlist)
   err2=matrix(NA,nrow=nfolds,ncol=length(lamlist))
   for(ii in 1:nfolds) {
     cat("Fold", ii, ":")
     if(fit$type=="gaussian"){
-      a <- hierNet.path(x[-folds[[ii]],],y=y[ - folds[[ii]]], 
-                        lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace, stand.main=FALSE,...)
+      a <- hierNet.path(x[-folds[[ii]],],y=y[-folds[[ii]]], 
+                        lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace,
+                        stand.main=stand.main, stand.int=stand.int, ...)
       yhatt=predict.hierNet(a,newx=x[folds[[ii]],])
     }
     if(fit$type=="logistic"){
-      a <- hierNet.logistic.path(x[-folds[[ii]],],y=y[ - folds[[ii]]], 
-                                 lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace,stand.main=FALSE,...)
+      a <- hierNet.logistic.path(x[-folds[[ii]],],y=y[-folds[[ii]]], 
+                                 lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace,
+                                 stand.main=stand.main, stand.int=stand.int, ...)
       yhatt=predict.hierNet.logistic(a,newx=x[folds[[ii]],])$yhat
     }
     
@@ -918,7 +935,8 @@ hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
   lamhat.1se=lamlist[oo & lamlist>=lamhat][1]
   
   nonzero=colSums(fit$bp-fit$bn!=0)+apply(fit$th!=0,3,sum)
-  obj<- list(lamlist=lamlist, cv.err=errm,cv.se=errse,lamhat=lamhat, lamhat.1se=lamhat.1se,nonzero=nonzero,folds=folds,yhat=yhat,
+  obj<- list(lamlist=lamlist, cv.err=errm,cv.se=errse,lamhat=lamhat, lamhat.1se=lamhat.1se,
+             nonzero=nonzero,folds=folds,
              call = this.call)
   class(obj) <- "hierNet.cv"
   obj
@@ -927,16 +945,16 @@ hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
 plot.hierNet.cv <- function(x, ...) {
   par(mar = c(5, 5, 5, 1))
   yrang=range(c(x$cv.err-x$cv.se,x$cv.err+x$cv.se))
-  plot(x$lamlist, x$cv.err, xlab = 
-       "Value of lambda  ", ylab = "Cross-validation Error", type="n",ylim=yrang)
-  axis(3, at = x$lamlist, labels = paste(x$nonzero), srt = 90, adj = 0)
+  plot(log(x$lamlist), x$cv.err, xlab="log(lambda)",
+       ylab = "Cross-validation Error", type="n",ylim=yrang)
+  axis(3, at = log(x$lamlist), labels = paste(x$nonzero), srt = 90, adj = 0)
   mtext("Number of features", 3, 4, cex = 1.2)
   axis(2, at = c(0, 0.2, 0.4, 0.6, 0.8))
-  lines(x$lamlist, x$cv.err, col = 3)
-  o <- x$cv.err == min(x$cv.err)
-  points(x$lamlist[o], x$cv.err[o], pch = "x")
-  error.bars(x$lamlist, x$cv.err - x$cv.se, x$cv.err + x$cv.se, col=3)
-  return()
+  error.bars(log(x$lamlist), x$cv.err - x$cv.se, x$cv.err + x$cv.se, width = 0.01, col = "darkgrey")
+  points(log(x$lamlist), x$cv.err, col=2, pch=19)
+  abline(v=log(x$lamhat), lty=3)
+  abline(v=log(x$lamhat.1se), lty=3)
+  invisible()
 }
 
 error.bars <-function(x, upper, lower, width = 0.02, ...) {
