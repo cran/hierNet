@@ -15,7 +15,7 @@ hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0,...)
   \item{y}{A vector of observations, where length(y)  equals
     nrow(x)}
 \item{nfolds}{Number of cross-validation folds}
-\item{folds}{Number of cross-validation folds}
+\item{folds}{(Optional) user-supplied cross-validation folds.  If provided, nfolds is ignored.}
 \item{trace}{Verbose output? 0=no, 1=yes}
 \item{...}{Additional arguments to be passed to hierNet.path or hierNet.logistic.path}
 }

@@ -108,7 +108,6 @@ print.hierNet <- function(x, ...) {
     # model has interactions
     th=th[o,o2]
     tight <- rowSums(abs(th)) >= x$bp[o] + x$bn[o] - 1e-9
-    print(which(o)[tight])
     tt <- rep("", length(tight))
     tt[tight] <- "*"
     mat=cbind(b,th)
@@ -890,14 +889,17 @@ permute.rows <-function(x) {
 
 hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
   this.call <- match.call()
+  stopifnot(class(fit) %in% c("hierNet.path", "hierNet.logistic.path"))
   if(fit$type=="gaussian"){errfun=function(y,yhat){(y-yhat)^2}} 
   if(fit$type=="logistic"){errfun=function(y,yhat){1*(y!=yhat)}} 
   n <- length(y)
   if(is.null(folds)) {
     folds <- split(sample(1:n), rep(1:nfolds, length = n))
   }
-  else nfolds <- length(folds)
-  
+  else {
+    stopifnot(class(folds)=="list")
+    nfolds <- length(folds)
+  } 
   lamlist=fit$lamlist
 
   # get whether fit was standardized based on fit$sx and fit$szz...
