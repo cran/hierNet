@@ -18,7 +18,7 @@ hierNet.logistic.path(x, y,
            lamlist = NULL, delta=1e-8, minlam = NULL, maxlam = NULL, flmin=.01, nlam = 20,
            diagonal = TRUE, strong = FALSE, aa = NULL, zz = NULL,
            stand.main = TRUE, stand.int = FALSE,
-           rho = 1, niter = NULL, sym.eps = 0.001, 
+           rho = 1, niter = 100, sym.eps = 0.001, 
            step = 1, maxiter = 2000, backtrack = 0.2, tol = 1e-05, trace = 0)
 }
 
@@ -65,8 +65,7 @@ flmin to focus on the sparser part of the path}
 \item{mzz}{column means of feature product matrix}
 \item{szz}{column standard deviations of feature product matrix}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-"A lasso for interactions." Accepted for publication in Annals of Statistics.}
+\references{Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet},\link{predict.hierNet}, \link{hierNet.cv}}
 \examples{

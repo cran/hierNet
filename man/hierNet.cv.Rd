@@ -6,10 +6,11 @@
 Uses cross-validation to estimate the regularization parameter for hierNet
 }
 \usage{
-hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0,...)
+hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0)
 }
 \arguments{
-  \item{fit}{Object returned from call to hierNet.path or hierNet.logistic.path.}
+  \item{fit}{Object returned from call to hierNet.path or hierNet.logistic.path.  All parameter settings
+will be taken from this object.}
   \item{x}{A matrix of predictors, where the rows are the samples and
     the columns are the predictors}
   \item{y}{A vector of observations, where length(y)  equals
@@ -33,8 +34,7 @@ hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0,...)
   lambda value}
 \item{call}{The call to hierNet.cv}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-"A lasso for interactions." Accepted for publication in Annals of Statistics.}
+\references{Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet},\link{hierNet.path}, \link{hierNet.logistic},\link{hierNet.logistic.path}}
 \examples{

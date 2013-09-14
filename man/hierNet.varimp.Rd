@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Variable importance for hierNet.}
 \description{
-Calculates a measure of the importance of each variable.
+(This is an experimental function.)  Calculates a measure of the importance of each variable.
 }
 \usage{
 hierNet.varimp(fit, x, y, ...)
@@ -17,8 +17,7 @@ hierNet.varimp(fit, x, y, ...)
 \value{
 Table of variable importance.
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-"A lasso for interactions." Accepted for publication in Annals of Statistics.}
+\references{Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet}, \link{hierNet.path} }
 \examples{

@@ -56,8 +56,7 @@ hierNet(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL, zz=NULL,
   \item{szz}{ column standard deviations of feature product matrix}
   \item{call}{The call to hierNet}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-"A lasso for interactions." Accepted for publication in Annals of Statistics.}
+\references{Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{predict.hierNet}, \link{hierNet.cv}, \link{hierNet.path}}
 \examples{

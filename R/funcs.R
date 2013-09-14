@@ -60,7 +60,7 @@ hierNet <- function(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL,
       if (thr > 0) {
         cat("  thr = ",thr, fill=TRUE)
         if (thr > 1e-3)
-          warning("Had to change ADMM's 'th' by more than 0.001 to make strong hier hold! Should probably run ADMM longer. ")
+          warning("Had to change ADMM's 'th' by more than 0.001 to make strong hier hold! Increase niter (and/or rho). ")
         aa$th[abs(aa$th) <= thr] <- 0
       }
     }
@@ -84,8 +84,18 @@ hierNet <- function(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL,
   aa$delta <- delta
   aa$type <- "gaussian"
   aa$diagonal <- diagonal
+  aa$strong <- strong
   aa$obj <- Objective(aa=aa, x=x, y=y, lam.l1=lam.l1, lam.l2=lam.l2, xnum=xnum, zz=zz, strong=strong)
-  
+  aa$step <- step
+  aa$maxiter <- maxiter
+  aa$backtrack <- backtrack
+  aa$tol <- tol
+  if (strong) {
+    # ADMM parameters:
+    aa$rho <- rho
+    aa$niter <- niter
+    aa$sym.eps <- sym.eps
+  }
   aa$mx <- mx
   aa$sx <- sx
   aa$my <- my
@@ -106,7 +116,7 @@ print.hierNet <- function(x, ...) {
   b=b[o]
   if (any(o2)) {
     # model has interactions
-    th=th[o,o2]
+    th=th[o,o2,drop=FALSE]
     tight <- rowSums(abs(th)) >= x$bp[o] + x$bn[o] - 1e-9
     tt <- rep("", length(tight))
     tt[tight] <- "*"
@@ -137,34 +147,11 @@ print.hierNet <- function(x, ...) {
 print.hierNet.path <- function(x, ...) {
   cat("Call:\n")
   dput(x$call)
- b=x$bp-x$bn
-mat=cbind(round(x$lam,2),round(x$obj,2),colSums(b!=0),apply(x$th^2!=0,c(3),sum))
+  b=x$bp-x$bn
+  mat=cbind(round(x$lam,2),round(x$obj,2),colSums(b!=0),apply(x$th!=0,3,function(a) sum(diag(a)) + sum((a+t(a)!=0)[upper.tri(a)])))
 
   dimnames(mat)=list(NULL,c("Lambda", "Objective", "Number of main effects","Number of interactions"))
- cat("\n")
-  print(mat, quote = FALSE)
-  invisible()
-}
-
-print.hierNet.logistic <- function(x, ...) {
-  cat("Call:\n")
-  dput(x$call)
-  th=(x$th+t(x$th))/2
-  o2=colSums(th^2)!=0
-  b=x$bp-x$bn
-  o=b!=0
-  th=th[o,o2]
-  b=b[o]
-  mat=cbind(b,th)
-  mat=round(mat,4)
   cat("\n")
-  cat("Non-zero coefficients:",fill=T)
-  cat("rows are predictors with nonzero main effects;",fill=T)
-  cat("columns are main effect, and interaction of row predictor
-with predictor in each column",fill=T)
-  cat("\n")
-  
-  dimnames(mat)=list(as.character(which(o)),c("Main effect",as.character(which(o2))))
   print(mat, quote = FALSE)
   invisible()
 }
@@ -187,7 +174,7 @@ cat(c("lamhat=",round(x$lamhat,2),"lamhat.1se=",round(x$lamhat.1se,2)),fill=T)
 hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NULL, nlam=20, flmin=.01,
                          diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
                          stand.main=TRUE, stand.int=FALSE,
-                         rho=1, niter=NULL, sym.eps=1e-3,# ADMM params
+                         rho=1, niter=100, sym.eps=1e-3,# ADMM params
                          step=1, maxiter=2000, backtrack=0.2, tol=1e-5, # GG descent params
                          trace=0) {
   # Main Hiernet function for fitting at a sequence of lambda values.
@@ -206,6 +193,7 @@ hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NUL
   y <- y - my
   
   if (is.null(maxlam)) {
+    if (!is.null(minlam)) stop("Cannot have maxlam=NULL if minlam is non-null.")
   #  maxlam <- max(abs(t(x) %*% y)/colSums(x^2))
     maxlam <- max(abs(t(x) %*% y))
   #  temp <- t(scale(t(x), center=FALSE, scale=1/y))
@@ -213,6 +201,7 @@ hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NUL
   #  maxlam <- max(max(temp2), maxlam)
     minlam <- maxlam * flmin
   }
+  if (is.null(minlam)) minlam <- maxlam * flmin
   if (is.null(lamlist))
     lamlist <- exp(seq(log(maxlam),log(minlam),length=nlam))
   nlam <- length(lamlist)
@@ -249,7 +238,15 @@ hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NUL
   dimnames(th) <- list(as.character(1:p), as.character(1:p), NULL)
 
   out <- list(bp=bp, bn=bn, th=th, obj=obj, lamlist=lamlist, delta=delta, mx=mx, sx=sx, mzz=mzz, szz=szz, my=my,
-              type="gaussian", diagonal=diagonal, call=this.call)
+              type="gaussian", diagonal=diagonal, strong=strong,
+              step=step, maxiter=maxiter, backtrack=backtrack, tol=tol,    
+              call=this.call)
+  if (strong) {
+    # ADMM parameters:
+    out$rho <- rho
+    out$niter <- niter
+    out$sym.eps <- sym.eps
+  }
   class(out) <- "hierNet.path"
   out
 }
@@ -297,7 +294,7 @@ predict.hierNet.path <- function(object, newx, newzz=NULL, ...){
  predict.hierNet(object, newx, newzz, ...)
 }
 
-admm4 <- function(x, xnum, y, lam.l1, lam.l2, diagonal, zz=NULL, rho=10, niter=20, aa=NULL, sym.eps=1e-3, trace=1, ...) {
+admm4 <- function(x, xnum, y, lam.l1, lam.l2, diagonal, zz=NULL, rho, niter, aa=NULL, sym.eps=1e-3, trace=1, ...) {
   # Performs ADMM4.
   # Note: xnum is the matrix x as a numeric.  Both are passed to avoid having to call as.numeric too
   # many times.
@@ -619,7 +616,7 @@ hierNet.logistic <- function(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE,
       if (thr > 0) {
         cat("  thr = ",thr, fill=TRUE)
         if (thr > 1e-3)
-          warning("Had to change ADMM's 'th' by more than 0.001 to make strong hier hold! Should probably run ADMM longer. ")
+          warning("Had to change ADMM's 'th' by more than 0.001 to make strong hier hold! Increase niter (and/or rho). ")
         aa$th[abs(aa$th) <= thr] <- 0
       }
     }
@@ -633,6 +630,17 @@ hierNet.logistic <- function(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE,
   out$delta <- delta
   out$type <- "logistic"
   out$diagonal <- diagonal
+  out$strong <- strong
+  if (strong) {
+    # ADMM parameters:
+    out$rho <- rho
+    out$niter <- niter
+    out$sym.eps <- sym.eps
+  }
+  out$step <- step
+  out$maxiter <- maxiter
+  out$backtrack <- backtrack
+  out$tol <- tol
   out$obj <- critf.logistic(x, y, lam.l1, lam.l2, out$b0, out$bp, out$bn, out$th)
   out$mx <- mx
   out$my <- 0
@@ -643,7 +651,7 @@ hierNet.logistic <- function(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE,
 }
 
 
-admm4.logistic <- function(x, xnum, y, lam.l1, lam.l2, diagonal, zz=NULL, rho=10, niter=20, aa=NULL, sym.eps=1e-3, trace=1, ...) {
+admm4.logistic <- function(x, xnum, y, lam.l1, lam.l2, diagonal, zz=NULL, rho=10, niter, aa=NULL, sym.eps=1e-3, trace=1, ...) {
   # Performs ADMM4 for logistic loss.
   # Note: xnum is the matrix x as a numeric.  Both are passed to avoid having to call as.numeric too
   # many times.
@@ -799,7 +807,7 @@ twonorm <- function(x) {sqrt(sum(x * x))}
 hierNet.logistic.path <- function (x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NULL, flmin=.01, nlam=20, 
                                    diagonal=TRUE, strong=FALSE, aa=NULL, 
                                    zz=NULL, stand.main=TRUE, stand.int=FALSE,
-                                   rho=1, niter=NULL, sym.eps=1e-3,# ADMM params
+                                   rho=1, niter=100, sym.eps=1e-3,# ADMM params
                                    step=1, maxiter=2000, backtrack=0.2, tol=1e-5, # GG params
                                    trace=0) {
   this.call=match.call()
@@ -809,9 +817,11 @@ hierNet.logistic.path <- function (x, y, lamlist=NULL, delta=1e-8, minlam=NULL, 
   sx <- attr(x, "scaled:scale")
   
   if (is.null(maxlam)) {
+    if (!is.null(minlam)) stop("Cannot have maxlam=NULL if minlam is non-null.")
     maxlam <- max(abs(t(x) %*% y))
     minlam <- maxlam * flmin
   }
+  if (is.null(minlam)) minlam <- maxlam * flmin
   if (is.null(lamlist))
     lamlist <- exp(seq(log(maxlam), log(minlam), length=nlam))
   nlam <- length(lamlist)
@@ -847,7 +857,15 @@ hierNet.logistic.path <- function (x, y, lamlist=NULL, delta=1e-8, minlam=NULL, 
   dimnames(th) <- list(as.character(1:p), as.character(1:p), NULL)
   out <- list(b0=b0, bp=bp, bn=bn, th=th, obj=obj, lamlist=lamlist, delta=delta,
               mx=mx, my=0, sx=sx, mzz=mzz, szz=szz,
-              type="logistic", diagonal=diagonal, call=this.call)
+              type="logistic", diagonal=diagonal, strong=strong,
+              step=step, maxiter=maxiter, backtrack=backtrack, tol=tol,
+              call=this.call)   
+  if (strong) {
+    # ADMM parameters:
+    out$rho <- rho
+    out$niter <- niter
+    out$sym.eps <- sym.eps
+  }
   class(out) <- "hierNet.path"
   out
 }
@@ -887,9 +905,9 @@ permute.rows <-function(x) {
   matrix(t(x)[order(mm)], n, p, byrow = TRUE)
 }
 
-hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
+hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0) {
   this.call <- match.call()
-  stopifnot(class(fit) %in% c("hierNet.path", "hierNet.logistic.path"))
+  stopifnot(class(fit) == "hierNet.path")
   if(fit$type=="gaussian"){errfun=function(y,yhat){(y-yhat)^2}} 
   if(fit$type=="logistic"){errfun=function(y,yhat){1*(y!=yhat)}} 
   n <- length(y)
@@ -914,14 +932,19 @@ hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
     cat("Fold", ii, ":")
     if(fit$type=="gaussian"){
       a <- hierNet.path(x[-folds[[ii]],],y=y[-folds[[ii]]], 
-                        lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace,
-                        stand.main=stand.main, stand.int=stand.int, ...)
+                        lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, strong=fit$strong, trace=trace,
+                        stand.main=stand.main, stand.int=stand.int,
+                        rho=fit$rho, niter=fit$niter, sym.eps=fit$sym.eps, # ADMM parameters (which will be NULL if strong=F)
+                        step=fit$step, maxiter=fit$maxiter, backtrack=fit$backtrack, tol=fit$tol) # GG descent params
+      
       yhatt=predict.hierNet(a,newx=x[folds[[ii]],])
     }
     if(fit$type=="logistic"){
       a <- hierNet.logistic.path(x[-folds[[ii]],],y=y[-folds[[ii]]], 
-                                 lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, trace=trace,
-                                 stand.main=stand.main, stand.int=stand.int, ...)
+                                 lamlist=lamlist, delta=fit$delta, diagonal=fit$diagonal, strong=fit$strong,
+                                 trace=trace, stand.main=stand.main, stand.int=stand.int,
+                                 rho=fit$rho, niter=fit$niter, sym.eps=fit$sym.eps, # ADMM parameters (which will be NULL if strong=F)
+                                 step=fit$step, maxiter=fit$maxiter, backtrack=fit$backtrack, tol=fit$tol) # GG descent params                                 
       yhatt=predict.hierNet.logistic(a,newx=x[folds[[ii]],])$yhat
     }
     
@@ -936,9 +959,9 @@ hierNet.cv <- function(fit, x, y, nfolds=10, folds=NULL, trace=0, ...) {
   oo=errm<= errm[o]+errse[o]
   lamhat.1se=lamlist[oo & lamlist>=lamhat][1]
   
-  nonzero=colSums(fit$bp-fit$bn!=0)+apply(fit$th!=0,3,sum)
-  obj<- list(lamlist=lamlist, cv.err=errm,cv.se=errse,lamhat=lamhat, lamhat.1se=lamhat.1se,
-             nonzero=nonzero,folds=folds,
+  nonzero=colSums(fit$bp-fit$bn!=0) + apply(fit$th!=0, 3, function(a) sum(diag(a)) + sum((a+t(a)!=0)[upper.tri(a)]))
+  obj <- list(lamlist=lamlist, cv.err=errm,cv.se=errse,lamhat=lamhat, lamhat.1se=lamhat.1se,
+             nonzero=nonzero, folds=folds,
              call = this.call)
   class(obj) <- "hierNet.cv"
   obj

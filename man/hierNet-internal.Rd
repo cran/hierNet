@@ -3,7 +3,6 @@
 \alias{print.hierNet}
 \alias{print.hierNet.path}
 \alias{print.hierNet.cv}
-\alias{print.hierNet.logistic}
 \alias{plot.hierNet.cv}
 \alias{critf.logistic}
 \alias{Objective}
@@ -11,10 +10,9 @@
 \alias{compute.interactions.c}
 \description{Internal hierNet functions}
 \usage{
-\method{print}{hierNet.logistic}(x,...)
+\method{print}{hierNet}(x,...)
 \method{print}{hierNet.path}(x,...)
 \method{print}{hierNet.cv}(x,...)
-\method{print}{hierNet.logistic}(x,...)
 \method{plot}{hierNet.cv}(x,...)
 critf.logistic(x, y, lam.l1, lam.l2, b0, bp, bn, th)
 Objective(aa, x, y, lam.l1, lam.l2, xnum = NULL, zz = NULL, strong = TRUE, 

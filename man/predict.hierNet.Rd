@@ -24,8 +24,7 @@ the "hierNet" or "hiernet.logistic" function.
   \item{yhat}{Vector of predictions for each observation. For logistic model, these are the
 estimated probabilities.}
 }
-\references{Bien, J. and Taylor, J. and  Tibshirani, R (2012)
-"A lasso for interactions." Accepted for publication in Annals of Statistics.}
+\references{Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.}
 \author{Jacob Bien and Robert Tibshirani}
 \seealso{\link{hierNet}, \link{hierNet.path} }
 \examples{
