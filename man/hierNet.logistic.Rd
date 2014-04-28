@@ -15,7 +15,7 @@ on a alternate algorithm for large scale problems.
 \usage{
 hierNet.logistic(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
                  center=TRUE, stand.main=TRUE, stand.int=FALSE,
-                 rho=1, niter=100, sym.eps=1e-3,# ADMM params
+                 rho=nrow(x), niter=100, sym.eps=1e-3,# ADMM params
                  step=1, maxiter=2000, backtrack=0.2, tol=1e-5, trace=1)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -35,7 +35,7 @@ hierNet.logistic(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE, aa=NULL, zz
   \item{stand.main}{Should main effects be standardized? Default TRUE}
   \item{stand.int}{Should interactions be standardized? Default FALSE}
   \item{rho}{ADMM parameter: tuning parameter (>0) for ADMM. If there are convergence
-    problems, try decreasing \code{rho}. Default 1.}
+    problems, try decreasing \code{rho}. Default n.}
   \item{niter}{ADMM parameter: number of iterations}
   \item{sym.eps}{ADMM parameter Thresholding for symmetrizing with strong=TRUE}
   \item{step}{Stepsize for generalized gradient descent}

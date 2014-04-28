@@ -1,5 +1,5 @@
 hierNet <- function(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL, zz=NULL, center=TRUE, stand.main=TRUE, stand.int=FALSE, 
-                    rho=1, niter=100, sym.eps=1e-3,
+                    rho=nrow(x), niter=100, sym.eps=1e-3,
                     step=1, maxiter=2000, backtrack=0.2, tol=1e-5,
                     trace=0) {
   # Main Hiernet function for fitting at a single parameter lambda.
@@ -47,7 +47,8 @@ hierNet <- function(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL,
   lam.l2 <- lam * delta
   if (strong) {
     # strong hierarchy -- use ADMM4
-    stopifnot(!is.null(rho), class(rho) == "numeric", is.finite(rho))
+    if (is.null(rho)) rho <- as.numeric(nrow(x))
+    stopifnot(is.numeric(rho), is.finite(rho))
     aa <- admm4(x, xnum, y, lam.l1=lam.l1, lam.l2=lam.l2, diagonal=diagonal, zz=zz,
                  rho=rho, niter=niter, aa=aa, sym.eps=sym.eps, # ADMM params
                  stepsize=step, backtrack=backtrack, maxiter=maxiter, tol=tol, # GG params
@@ -174,7 +175,7 @@ cat(c("lamhat=",round(x$lamhat,2),"lamhat.1se=",round(x$lamhat.1se,2)),fill=T)
 hierNet.path <- function(x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NULL, nlam=20, flmin=.01,
                          diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL,
                          stand.main=TRUE, stand.int=FALSE,
-                         rho=1, niter=100, sym.eps=1e-3,# ADMM params
+                         rho=nrow(x), niter=100, sym.eps=1e-3,# ADMM params
                          step=1, maxiter=2000, backtrack=0.2, tol=1e-5, # GG descent params
                          trace=0) {
   # Main Hiernet function for fitting at a sequence of lambda values.
@@ -544,7 +545,7 @@ ggdescent.c <- function(x, xnum, zz, y, lam.l1, lam.l2, diagonal, rho, V, stepsi
             y,
             as.double(lam.l1),
 	    as.double(lam.l2),
-            rho,
+            as.double(rho),
             as.double(V),
             as.integer(maxiter),
             as.double(aa$th),
@@ -565,7 +566,7 @@ ggdescent.c <- function(x, xnum, zz, y, lam.l1, lam.l2, diagonal, rho, V, stepsi
 
 hierNet.logistic <- function(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE, aa=NULL, zz=NULL, center=TRUE,
                              stand.main=TRUE, stand.int=FALSE,
-                             rho=1, niter=100, sym.eps=1e-3,# ADMM params
+                             rho=nrow(x), niter=100, sym.eps=1e-3,# ADMM params
                              step=1, maxiter=2000, backtrack=0.2, tol=1e-5, # GG descent params
                              trace=1) {
   # Solves the logistic regression hiernet. Returns (b0, bp, bn, th)
@@ -603,7 +604,7 @@ hierNet.logistic <- function(x, y, lam, delta=1e-8, diagonal=TRUE, strong=FALSE,
   xnum <- as.numeric(x)
   if (strong) {
     # strong hierarchy -- use ADMM4 (logistic regression version)
-    stopifnot(!is.null(rho), class(rho) == "numeric", is.finite(rho))
+    stopifnot(is.numeric(rho), is.finite(rho))
     out <- admm4.logistic(x, xnum, y, lam.l1, lam.l2, diagonal=diagonal, zz=zz,
                           rho=rho, niter=niter, aa=aa, sym.eps=sym.eps, # ADMM params
                           stepsize=step, backtrack=backtrack, maxiter=maxiter, tol=tol, # GG params
@@ -807,7 +808,7 @@ twonorm <- function(x) {sqrt(sum(x * x))}
 hierNet.logistic.path <- function (x, y, lamlist=NULL, delta=1e-8, minlam=NULL, maxlam=NULL, flmin=.01, nlam=20, 
                                    diagonal=TRUE, strong=FALSE, aa=NULL, 
                                    zz=NULL, stand.main=TRUE, stand.int=FALSE,
-                                   rho=1, niter=100, sym.eps=1e-3,# ADMM params
+                                   rho=nrow(x), niter=100, sym.eps=1e-3,# ADMM params
                                    step=1, maxiter=2000, backtrack=0.2, tol=1e-5, # GG params
                                    trace=0) {
   this.call=match.call()
@@ -862,7 +863,7 @@ hierNet.logistic.path <- function (x, y, lamlist=NULL, delta=1e-8, minlam=NULL, 
               call=this.call)   
   if (strong) {
     # ADMM parameters:
-    out$rho <- rho
+    out$rho <- aa$rho
     out$niter <- niter
     out$sym.eps <- sym.eps
   }

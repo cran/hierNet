@@ -17,7 +17,7 @@ hierNet.path(x, y,
              lamlist = NULL, delta=1e-8, minlam = NULL, maxlam = NULL, nlam=20, flmin=.01,
              diagonal = TRUE, strong = FALSE, aa = NULL, zz = NULL,
              stand.main = TRUE, stand.int = FALSE,
-             rho = 1, niter = 100, sym.eps = 0.001, 
+             rho = nrow(x), niter = 100, sym.eps = 0.001, 
              step = 1, maxiter = 2000, backtrack = 0.2, tol = 1e-05, trace = 0)
 }
 
@@ -42,7 +42,7 @@ hierNet.path(x, y,
 \item{stand.main}{Should main effects be standardized? Default TRUE}
 \item{stand.int}{Should interactions be standardized? Default FALSE}
 \item{rho}{ADMM parameter: tuning parameter (>0) for ADMM. If there are convergence
-  problems, try decreasing rho. Default 1.}
+  problems, try decreasing rho. Default n.}
 \item{niter}{ADMM parameter: number of iterations}
 \item{sym.eps}{ADMM parameter Thresholding for symmetrizing with strong=TRUE}
 \item{step}{Stepsize for generalized gradient descent}

@@ -13,7 +13,7 @@ on an alternate algorithm for large scale problems.
 \usage{
 hierNet(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL, zz=NULL,
         center=TRUE, stand.main=TRUE, stand.int=FALSE, 
-        rho=1, niter=100, sym.eps=1e-3,
+        rho=nrow(x), niter=100, sym.eps=1e-3,
         step=1, maxiter=2000, backtrack=0.2, tol=1e-5, trace=0)}
 \arguments{
   \item{x}{A matrix of predictors, where the rows are the samples and
@@ -32,7 +32,7 @@ hierNet(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL, zz=NULL,
   \item{stand.main}{Should main effects be standardized? Default TRUE.}
   \item{stand.int}{Should interactions be standardized? Default FALSE.}
   \item{rho}{ADMM parameter: tuning parameter (>0) for ADMM. If there are convergence
-    problems, try decreasing \code{rho}. Default 1.}
+    problems, try decreasing \code{rho}. Default n.}
   \item{niter}{ADMM parameter: number of iterations}
   \item{sym.eps}{ADMM parameter: threshold for symmetrizing with strong=TRUE}
   \item{step}{Stepsize for generalized gradient descent}
@@ -69,7 +69,7 @@ fit=hierNet(x,y,lam=50)
 print(fit)
 
 # try strong (rather than weak) hierarchy
-fit=hierNet(x,y,lam=50, strong=TRUE, rho=2)
+fit=hierNet(x,y,lam=50, strong=TRUE)
 print(fit)
 
 # a typical analysis including cross-validation
