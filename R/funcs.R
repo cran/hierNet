@@ -422,7 +422,7 @@ compute.interactions.c <- function(x, diagonal=TRUE) {
               as.integer(p),
               z=rep(0, n * cp2),
               i1=as.integer(rep(0, cp2)),
-              i2=as.integer(rep(0, cp2)), dupl = FALSE, PACKAGE="hierNet")
+              i2=as.integer(rep(0, cp2)), PACKAGE="hierNet")
   }
   else {
     out <- .C("ComputeInteractionsWithIndices",
@@ -431,7 +431,7 @@ compute.interactions.c <- function(x, diagonal=TRUE) {
               as.integer(p),
               z=rep(0, n * cp2),
               i1=as.integer(rep(0, cp2)),
-              i2=as.integer(rep(0, cp2)), dupl = FALSE, PACKAGE="hierNet")
+              i2=as.integer(rep(0, cp2)), PACKAGE="hierNet")
   }
   z <- matrix(out$z, n, cp2)
   rownames(z) <- rownames(x)
@@ -455,7 +455,7 @@ compute.full.interactions.c <- function(x) {
             as.integer(n),
             as.integer(p),
             z=rep(0, n * p^2),
-            dupl = FALSE, PACKAGE="hierNet")
+            PACKAGE="hierNet")
   matrix(out$z, n, p^2)
 }
 
@@ -480,7 +480,7 @@ Compute.yhat.c <- function(xnum, zz, aa) {
             aa$bp,
             aa$bn,
             yhat=rep(0, n),
-            DUP=FALSE, PACKAGE="hierNet")
+            PACKAGE="hierNet")
   out$yhat
 }
 
@@ -507,7 +507,7 @@ Compute.phat.c <- function(xnum, zz, aa) {
             aa$bp,
             aa$bn,
             phat=rep(0, n),
-            DUP=FALSE, PACKAGE="hierNet")
+            PACKAGE="hierNet")
   out$phat
 }
 
@@ -559,7 +559,7 @@ ggdescent.c <- function(x, xnum, zz, y, lam.l1, lam.l2, diagonal, rho, V, stepsi
             th=rep(0, p*p),
             bp=rep(0, p),
             bn=rep(0, p),
-            DUP=FALSE, PACKAGE="hierNet")
+            PACKAGE="hierNet")
   list(bp=out$bp, bn=out$bn, th=matrix(out$th, p, p))
 }
 
@@ -748,7 +748,7 @@ ggdescent.logistic <- function(xnum, zz, y, lam.l1, lam.l2, diagonal, rho, V, st
             th=rep(0, p*p),
             bp=rep(0, p),
             bn=rep(0, p),
-            DUP=FALSE, PACKAGE="hierNet")
+            PACKAGE="hierNet")
   list(b0=out$b0, bp=out$bp, bn=out$bn, th=matrix(out$th, p, p))
 }
 

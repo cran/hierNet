@@ -27,8 +27,8 @@ x=scale(x,TRUE,TRUE)
 y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
 newx=matrix(rnorm(100*10),ncol=10)
 fit=hierNet(x,y,lam=50)
-yhat=predict.hierNet(fit,newx)
+yhat=predict(fit,newx)
 
 fit=hierNet.path(x,y)
-yhat=predict.hierNet(fit,newx)
+yhat=predict(fit,newx)
 }

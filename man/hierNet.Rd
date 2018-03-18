@@ -83,5 +83,5 @@ print(fitcv)
 
 lamhat=fitcv$lamhat.1se
 fit2=hierNet(x,y,lam=lamhat)
-yhat=predict.hierNet(fit2,x)
+yhat=predict(fit2,x)
 }
